@@ -7,8 +7,8 @@ from textblob import TextBlob
 word_noun_forms = Word("match").get_synsets(pos=VERB)
 word_verb_forms = Word("match").get_synsets(pos=NOUN)
 
-word = TextBlob("good")
-ant_word = TextBlob("amazingly good")
+word = TextBlob("nice")
+ant_word = TextBlob("nice gps")
 
 
 print(word.sentiment.polarity)

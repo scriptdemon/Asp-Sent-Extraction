@@ -15,6 +15,7 @@ pattern_adverb = r'^RB(R|S)?$'
 
 asp_sent = {}
 asp_rating = {}
+
 for line in f:
     raw_sentences = TextBlob(line)
 
@@ -22,6 +23,12 @@ def insert_asp_sent(asp,sent):
     if asp not in asp_sent:
         asp_sent[asp] = []
     asp_sent[asp].append(sent)
+
+def getNegRelations(dep_output,negatives):
+    for j in dep_output['sentences'][0]['basicDependencies']:
+        gov = j['governorGloss']
+        if j['dep'] == 'neg':
+            negatives[gov] = ''
 
 def getAntonym(word):
     word = str(word)
@@ -39,9 +46,9 @@ def getAntonym(word):
             synonyms.append(l.name())
             if l.antonyms():
                 antonyms.append(l.antonyms()[0].name())
-    print(synonyms)
-    print(antonyms)
-    print(definition)
+    ##print(synonyms)
+    ##print(antonyms)
+    ##print(definition)
     ##Finding desirable word
     for ind_word in antonyms:
         blob_wrapped_word = TextBlob(ind_word)
@@ -75,6 +82,7 @@ def testCompound(noun,adj):
         if k['dep'] == 'compound' and gov == noun:
             modified_adj = adj+" "+dep
             insert_asp_sent(noun,modified_adj)
+            break
 
 def testAdvModAdj(noun,adj):
     for k in dep_output['sentences'][0]['basicDependencies']:
@@ -83,12 +91,13 @@ def testAdvModAdj(noun,adj):
         if k['dep'] == 'advmod' and gov == adj:
             modified_adj = dep+" "+gov
             insert_asp_sent(noun,modified_adj)
+            break
 
 sent_array = raw_sentences.sentences
 for ind in sent_array:
     text = str(ind)
     #tokenized = nltk.word_tokenize(text)
-
+    negatives = {}
     d={}
     pos_output = nlp.annotate(text,properties={
         'annotators': 'pos',
@@ -99,6 +108,7 @@ for ind in sent_array:
         'annotators': 'depparse',
         'outputFormat': 'json'
     })
+    ##extract neg relations for further references
 
     for i in pos_output['sentences'][0]['tokens']:
         d[i['word']] = i['pos']
@@ -121,6 +131,7 @@ for ind in sent_array:
             ##rule 2: nsubj - adjective link
             if re.match(pattern_adj,d[gov]) and re.match(pattern_noun,d[dep]):
                 # check if there exists a negative relationship
+                testConj(dep,gov)
                 if existsNegative(gov, dep_output):
                     temp = getAntonym(gov)
                     insert_asp_sent(dep,temp)
@@ -135,12 +146,19 @@ for ind in sent_array:
                     temp_dep = k['dependentGloss']
                     if k['dep'] == 'xcomp' or k['dep'] == 'acomp':
                         if re.match(pattern_verb,d[temp_gov]) and re.match(pattern_adj,d[temp_dep]) and temp_gov == gov:
+                            ##conj relation
+                            testConj(dep,temp_dep)
+                            ##compund relation
+                            testCompound(dep,temp_dep)
+                            ##xcomp with advmod
+                            testAdvModAdj(dep, temp_dep)
                             if existsNegative(temp_gov, dep_output):
                                 temp = getAntonym(temp_dep)
                                 insert_asp_sent(dep, temp)
                             else:
                                 insert_asp_sent(dep, temp_dep)
                     elif k['dep'] == 'dobj':
+                        ##dobj with amod
                         if re.match(pattern_verb,d[temp_gov]) and re.match(pattern_noun,d[temp_dep]) and temp_gov == gov:
                             if existsNegative(temp_gov, dep_output):
                                 temp = getAntonym(temp_dep)
