@@ -9,7 +9,8 @@ from nltk.corpus import wordnet
 import test_main_rules as rules
 
 nlp = StanfordCoreNLP('http://localhost:9000')
-f = open("sample_sentences.txt","r")
+#f = open("sample_sentences.txt","r")
+f = "The camera on this phone is beautiful."
 
 asp_sent = {}
 asp_rating = {}
@@ -89,3 +90,14 @@ for ind in sent_array:
             asp_sent = rules.nsubjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
 
     print(asp_sent)
+
+for asp in asp_sent:
+    length = len(asp_sent[asp])
+    avg = 0
+    sum = 0
+    for word in asp_sent[asp]:
+        blob_word = TextBlob(word)
+        sum = sum + blob_word.sentiment.polarity
+    avg = sum / length
+    asp_rating[asp] = avg
+print(asp_rating)

@@ -10,7 +10,6 @@ word_verb_forms = Word("match").get_synsets(pos=NOUN)
 word = TextBlob("nice")
 ant_word = TextBlob("nice gps")
 
-
 print(word.sentiment.polarity)
 print(ant_word.sentiment.polarity)
 #print(word_noun_forms)

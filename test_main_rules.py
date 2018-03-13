@@ -62,9 +62,6 @@ def getAntonym(word):
             synonyms.append(l.name())
             if l.antonyms():
                 antonyms.append(l.antonyms()[0].name())
-    ##print(synonyms)
-    ##print(antonyms)
-    ##print(definition)
     ##Finding desirable word
     for ind_word in antonyms:
         blob_wrapped_word = TextBlob(ind_word)
