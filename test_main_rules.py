@@ -84,7 +84,11 @@ def testConj(noun,adj,pos_dict,rel_dict,neg,asp_sent):
                     asp_sent = insert_asp_sent(noun,new_adj,asp_sent)
                 else:
                     asp_sent = insert_asp_sent(noun,temp_dep,asp_sent)
-    asp_sent = insert_asp_sent(noun,adj,asp_sent)
+    if existsNegative(adj,neg):
+        new_adj = "not "+adj
+        asp_sent = insert_asp_sent(noun,new_adj,asp_sent)
+    else:
+        asp_sent = insert_asp_sent(noun,adj,asp_sent)
     return asp_sent
 
 def testCompound(noun,adj,pos_dict,rel_dict,neg,asp_sent):
@@ -154,6 +158,7 @@ def amodRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     return asp_sent
 
 def nsubjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+    print(neg)
     if re.match(pattern_adj,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
         asp_sent = testConj(dep, gov, pos_dict, rel_dict, neg, asp_sent)
         asp_sent = testCompound(dep, gov, pos_dict, rel_dict, neg, asp_sent)

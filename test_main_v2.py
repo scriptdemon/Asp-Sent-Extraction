@@ -10,7 +10,7 @@ import test_main_rules as rules
 
 nlp = StanfordCoreNLP('http://localhost:9000')
 #f = open("sample_sentences.txt","r")
-line = "The camera on this phone is beautiful."
+line = "Man is not hot."
 
 asp_sent = {}
 asp_rating = {}
@@ -46,7 +46,7 @@ def getNegRelations(dep_output,negatives):
         gov = j['governorGloss']
         if j['dep'] == 'neg':
             negatives[gov] = ''
-
+    return negatives
 #wrap the sentences in TextBlob and Sentence Tokenize
 #for line in f:
     #sent_array = corefResolver(line)
@@ -66,6 +66,8 @@ for ind in sent_array:
         'annotators': 'depparse',
         'outputFormat': 'json'
     })
+
+    negatives = getNegRelations(dep_output,negatives)
 
     #making POS tags dictionary
     for i in pos_output['sentences'][0]['tokens']:
