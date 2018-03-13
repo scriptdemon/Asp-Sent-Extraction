@@ -18,7 +18,6 @@ def corefResolver(line):
     ind_sent = []
     complete_coref_output = nlp.annotate(line,properties={'annotators':'dcoref','outputFormat':'json'})
     coref_output = complete_coref_output['corefs']
-    print(coref_output)
     raw_sent = TextBlob(line)
     sent_array = raw_sent.sentences
     for j in sent_array:
@@ -49,19 +48,13 @@ def getNegRelations(dep_output,negatives):
 
 #wrap the sentences in TextBlob and Sentence Tokenize
 for line in f:
-    ##print(type(line))
-    ##raw_sentences = TextBlob(line)
     sent_array = corefResolver(line)
-
-for each in sent_array:
-    print(each)
 
 for ind in sent_array:
     text = str(ind)
     negatives = {}
     d = {}
     rel_dictionary = {}
-
     pos_output = nlp.annotate(text, properties={
         'annotators': 'pos',
         'outputFormat': 'json'
@@ -92,5 +85,7 @@ for ind in sent_array:
         dep = j['dependentGloss']
         if j['dep'] == 'amod':
             asp_sent = rules.amodRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
-        if j['dep'] == 'nsubj':
+        elif j['dep'] == 'nsubj':
             asp_sent = rules.nsubjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
+
+    print(asp_sent)

@@ -76,7 +76,6 @@ def getAntonym(word):
     return desirable
 
 def testConj(noun,adj,pos_dict,rel_dict,neg,asp_sent):
-    asp_sent = insert_asp_sent(noun, adj, asp_sent)
     if 'conj' in rel_dict:
         conj_arr = rel_dict.get('conj')
         for j in conj_arr:
@@ -88,6 +87,7 @@ def testConj(noun,adj,pos_dict,rel_dict,neg,asp_sent):
                     asp_sent = insert_asp_sent(noun,new_adj,asp_sent)
                 else:
                     asp_sent = insert_asp_sent(noun,temp_dep,asp_sent)
+    asp_sent = insert_asp_sent(noun,adj,asp_sent)
     return asp_sent
 
 def testCompound(noun,adj,pos_dict,rel_dict,neg,asp_sent):
@@ -135,6 +135,7 @@ def testXcompAcomp(noun,verb,pos_dict,rel_dict,neg,asp_sent):
                 asp_sent = testConj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
                 asp_sent = testCompound(noun, temp_dep, pos_dict, rel_dict, neg, asp_sent)
                 asp_sent = testAdvModAdj(noun, temp_dep, pos_dict, rel_dict, neg, asp_sent)
+    return asp_sent
 
 def testAdvmod(noun,verb,pos_dict,rel_dict,neg,asp_sent):
     if 'advmod' in rel_dict:
@@ -146,6 +147,7 @@ def testAdvmod(noun,verb,pos_dict,rel_dict,neg,asp_sent):
                 asp_sent = testConj(noun,temp_dep,pos_dict,rel_dict,asp_sent)
                 asp_sent = testCompound(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
                 asp_sent = testAdvModAdj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
+    return asp_sent
 
 def amodRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     if (re.match(pattern_adj,pos_dict[dep]) or re.match(pattern_verb,pos_dict[dep])) and re.match(pattern_noun,pos_dict[gov]):
