@@ -90,7 +90,7 @@ for ind in sent_array:
         elif j['dep'] == 'nsubj':
             asp_sent = rules.nsubjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
 
-    print(asp_sent)
+print(asp_sent)
 
 for asp in asp_sent:
     length = len(asp_sent[asp])
