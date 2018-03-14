@@ -121,6 +121,24 @@ def testAdvModAdj(noun,adj,pos_dict,rel_dict,neg,asp_sent):
                 asp_sent = insert_asp_sent(noun,new_adj,asp_sent)
     return asp_sent
 
+def testConjVerb(noun,verb,pos_dict,rel_dict,neg,asp_sent):
+    if existsNegative(verb,neg):
+        new_adj = getAntonym(verb)
+    else:
+        new_adj = verb
+
+    if 'conj' in rel_dict:
+        conj_arr = rel_dict.get('conj')
+        for j in conj_arr:
+            temp_gov = j['gov']
+            temp_dep = j['dep']
+
+        if temp_gov == noun and re.match(pattern_noun,pos_dict[temp_dep]):
+            insert_asp_sent(temp_dep,new_adj,asp_sent)
+
+    insert_asp_sent(noun,new_adj,asp_sent)
+    return asp_sent
+
 def testXcompAcomp(noun,verb,pos_dict,rel_dict,neg,asp_sent):
     comp_arr = ''
     if 'xcomp' in rel_dict:
@@ -166,4 +184,16 @@ def nsubjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     elif re.match(pattern_verb,pos_dict[gov])and re.match(pattern_noun,pos_dict[dep]):
         asp_sent = testXcompAcomp(dep,gov,pos_dict,rel_dict,neg,asp_sent)
         asp_sent = testAdvmod(dep,gov,pos_dict,rel_dict,neg,asp_sent)
+    return asp_sent
+
+def aclReclRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+    if re.match(pattern_noun,pos_dict[gov]) and (re.match(pattern_adj,pos_dict[dep]) or re.match(pattern_verb,pos_dict[dep])):
+        asp_sent = testConj(gov,dep,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testCompound(gov,dep,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testAdvModAdj(gov,dep,pos_dict,rel_dict,neg,asp_sent)
+    return asp_sent
+
+def dobjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+    if re.match(pattern_verb,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
+        asp_sent = testConjVerb(dep,gov,pos_dict,rel_dict,neg,asp_sent)
     return asp_sent

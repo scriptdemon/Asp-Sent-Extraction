@@ -1,16 +1,18 @@
-import json
-import nltk
-import math
-import re
-import string
+#import json
+#import nltk
+#import math
+#import re
+#import string
 from pycorenlp import StanfordCoreNLP
 from textblob import TextBlob
 from nltk.corpus import wordnet
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import test_main_rules as rules
 
+analyser = SentimentIntensityAnalyzer()
 nlp = StanfordCoreNLP('http://localhost:9000')
 #f = open("sample_sentences.txt","r")
-line = "While many beginner DVDs try to teach you everything there is to know about Photoshop CS5, this introductory course shows you the critical things you need to know to start feeling confident in your Photoshop skills. Bestselling author and Photoshop trainer, Matt Kloskowski shows you exactly what you need to know about tools, filters, adjustments, palettes, and menu items to hit the ground running in Photoshop. These include: layers and how they're key to mastering Photoshop, selections and the essential tools you really need to worry about, getting started with Camera Raw and which Retouching tools you'll find the most helpful. When you're done with this DVD you'll have a solid grasp of the most important features and be at the next level in no time."
+line = "I use the camera and display."
 
 asp_sent = {}
 asp_rating = {}
@@ -26,7 +28,7 @@ def corefResolver(line):
     for k in coref_output:
         prop_noun = ""
         for m in coref_output[k]:
-            if m['type'] == 'NOMINAL' and prop_noun == "":
+            if (m['type'] == 'NOMINAL' or m['type'] == 'PROPER') and prop_noun == "":
                 prop_noun = m['text']
             elif m['type'] == 'PRONOMINAL' and prop_noun != "":
                 sent_num = int(m['sentNum'])
@@ -51,6 +53,8 @@ def getNegRelations(dep_output,negatives):
 #for line in f:
     #sent_array = corefResolver(line)
 sent_array = corefResolver(line)
+for k in sent_array:
+    print(k)
 
 for ind in sent_array:
     text = str(ind)
@@ -91,6 +95,13 @@ for ind in sent_array:
             asp_sent = rules.amodRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
         elif j['dep'] == 'nsubj':
             asp_sent = rules.nsubjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
+        elif j['dep'] == 'acl:relcl':
+            asp_sent = rules.aclReclRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
+        elif j['dep'] == 'dobj':
+            sent_intensity = analyser.polarity_scores(ind)
+            if not sent_intensity['compound'] == 0:
+                asp_sent = rules.dobjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
+
 
 print(asp_sent)
 
