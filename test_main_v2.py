@@ -10,7 +10,7 @@ import test_main_rules as rules
 
 nlp = StanfordCoreNLP('http://localhost:9000')
 #f = open("sample_sentences.txt","r")
-line = "Man is not hot."
+line = "While many beginner DVDs try to teach you everything there is to know about Photoshop CS5, this introductory course shows you the critical things you need to know to start feeling confident in your Photoshop skills. Bestselling author and Photoshop trainer, Matt Kloskowski shows you exactly what you need to know about tools, filters, adjustments, palettes, and menu items to hit the ground running in Photoshop. These include: layers and how they're key to mastering Photoshop, selections and the essential tools you really need to worry about, getting started with Camera Raw and which Retouching tools you'll find the most helpful. When you're done with this DVD you'll have a solid grasp of the most important features and be at the next level in no time."
 
 asp_sent = {}
 asp_rating = {}
@@ -80,7 +80,7 @@ for ind in sent_array:
         if dep_name not in rel_dictionary:
             rel_dictionary[dep_name] = []
         rel_dictionary[dep_name].append({'gov':gov,'dep':dep})
-    print(rel_dictionary)
+    #print(rel_dictionary)
 
 
     #passing through each dependency

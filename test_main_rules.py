@@ -158,7 +158,6 @@ def amodRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     return asp_sent
 
 def nsubjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
-    print(neg)
     if re.match(pattern_adj,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
         asp_sent = testConj(dep, gov, pos_dict, rel_dict, neg, asp_sent)
         asp_sent = testCompound(dep, gov, pos_dict, rel_dict, neg, asp_sent)
