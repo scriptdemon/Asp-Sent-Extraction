@@ -12,7 +12,7 @@ import test_main_rules as rules
 analyser = SentimentIntensityAnalyzer()
 nlp = StanfordCoreNLP('http://localhost:9000')
 #f = open("sample_sentences.txt","r")
-line = "I use the camera and display."
+line = "Excellent phone. nice look. good design and battery also good."
 
 asp_sent = {}
 asp_rating = {}
@@ -89,6 +89,7 @@ for ind in sent_array:
 
     #passing through each dependency
     for j in dep_output['sentences'][0]['basicDependencies']:
+        print(j)
         gov = j['governorGloss']
         dep = j['dependentGloss']
         if j['dep'] == 'amod':
@@ -101,6 +102,10 @@ for ind in sent_array:
             sent_intensity = analyser.polarity_scores(ind)
             if not sent_intensity['compound'] == 0:
                 asp_sent = rules.dobjRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
+        elif j['dep'] == 'nsubjpass':
+            sent_intensity = analyser.polarity_scores(ind)
+            if not sent_intensity['compound'] == 0:
+                asp_sent = rules.nsubjpassRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
 
 
 print(asp_sent)

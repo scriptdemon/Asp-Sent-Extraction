@@ -163,7 +163,7 @@ def testAdvmod(noun,verb,pos_dict,rel_dict,neg,asp_sent):
             temp_gov = j['gov']
             temp_dep = j['dep']
             if temp_gov == verb:
-                asp_sent = testConj(noun,temp_dep,pos_dict,rel_dict,asp_sent)
+                asp_sent = testConj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
                 asp_sent = testCompound(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
                 asp_sent = testAdvModAdj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
     return asp_sent
@@ -197,3 +197,7 @@ def dobjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     if re.match(pattern_verb,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
         asp_sent = testConjVerb(dep,gov,pos_dict,rel_dict,neg,asp_sent)
     return asp_sent
+
+def nsubjpassRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+    if re.match(pattern_verb,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
+        asp_sent = testConjNpssVerb(dep,gov,pos_dict,rel_dict,neg,asp_sent)

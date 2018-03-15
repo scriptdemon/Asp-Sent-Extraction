@@ -9,11 +9,11 @@ analyser = SentimentIntensityAnalyzer()
 word_noun_forms = Word("match").get_synsets(pos=VERB)
 word_verb_forms = Word("match").get_synsets(pos=NOUN)
 
-word = TextBlob("use")
-ant_word = TextBlob("I like the camera but hate battery")
+word = TextBlob("used")
+ant_word = TextBlob("modified")
 
-vad_word = analyser.polarity_scores("I use this camera")
-vad_word2 = analyser.polarity_scores("I like the camera but hate battery")
+vad_word = analyser.polarity_scores("Camera is modified.")
+vad_word2 = analyser.polarity_scores("Camera is improved.")
 
 print(vad_word)
 print(vad_word2)
