@@ -2,7 +2,7 @@
 #import nltk
 #import math
 #import re
-#import string
+import string
 from pycorenlp import StanfordCoreNLP
 from textblob import TextBlob
 from nltk.corpus import wordnet
@@ -12,7 +12,10 @@ import test_main_rules as rules
 analyser = SentimentIntensityAnalyzer()
 nlp = StanfordCoreNLP('http://localhost:9000')
 #f = open("sample_sentences.txt","r")
-line = "Excellent phone. nice look. good design and battery also good."
+line = '''
+I have received redmi note 4 black matte 64gb version today. Packaging is so good.
+About phone: its fabulous phone.Amazing battery back up, good camera, great memory, beautiful colour of phone with classy primium look of black matte makes it different from other phone. I am loving every feature of this phone.
+'''
 
 asp_sent = {}
 asp_rating = {}
@@ -53,10 +56,15 @@ def getNegRelations(dep_output,negatives):
 #for line in f:
     #sent_array = corefResolver(line)
 sent_array = corefResolver(line)
+
+count=0
 for k in sent_array:
-    print(k)
+    k = k.lower()
+    sent_array[count] = k
+    count += 1
 
 for ind in sent_array:
+    #print(ind)
     text = str(ind)
     negatives = {}
     d = {}
@@ -89,7 +97,7 @@ for ind in sent_array:
 
     #passing through each dependency
     for j in dep_output['sentences'][0]['basicDependencies']:
-        print(j)
+        #print(j)
         gov = j['governorGloss']
         dep = j['dependentGloss']
         if j['dep'] == 'amod':
@@ -107,16 +115,29 @@ for ind in sent_array:
             if not sent_intensity['compound'] == 0:
                 asp_sent = rules.nsubjpassRules(gov,dep,d,rel_dictionary,negatives,asp_sent)
 
-
-print(asp_sent)
+print("\nAspect Sentiment Pairs:")
+for each in asp_sent:
+    string = str(asp_sent[each])
+    print(each+" : "+string)
 
 for asp in asp_sent:
     length = len(asp_sent[asp])
     avg = 0
     sum = 0
     for word in asp_sent[asp]:
-        blob_word = TextBlob(word)
-        sum = sum + blob_word.sentiment.polarity
+        #blob_word = TextBlob(word)
+        sent_val = analyser.polarity_scores(word)
+        sum = sum + sent_val['compound']
     avg = sum / length
     asp_rating[asp] = avg
-print(asp_rating)
+
+#scaling on the 0 to 5 scale
+for asp in asp_sent:
+    non_scaled = asp_rating[asp]
+    scaled = (non_scaled + 1)*2.5
+    asp_rating[asp] = scaled
+
+print("\nRatings:")
+for each in asp_rating:
+    string = str(asp_rating[each])
+    print(each+" : "+string)

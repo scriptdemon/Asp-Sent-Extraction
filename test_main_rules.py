@@ -79,6 +79,7 @@ def testConj(noun,adj,pos_dict,rel_dict,neg,asp_sent):
             temp_gov = j['gov']
             temp_dep = j['dep']
             if temp_gov == adj:
+                asp_sent = testAdvModAdj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
                 if existsNegative(temp_dep,neg):
                     new_adj = getAntonym(temp_dep)
                     asp_sent = insert_asp_sent(noun,new_adj,asp_sent)
@@ -168,18 +169,35 @@ def testAdvmod(noun,verb,pos_dict,rel_dict,neg,asp_sent):
                 asp_sent = testAdvModAdj(noun,temp_dep,pos_dict,rel_dict,neg,asp_sent)
     return asp_sent
 
+def testConjNpassVerb(noun,verb,pos_dict,rel_dict,neg,asp_sent):
+    return asp_sent
+
+def checkCompound(noun,pos_dict,rel_dict):
+    if 'compound' in rel_dict:
+        compound_arr = rel_dict.get('compound')
+        for j in compound_arr:
+            temp_gov = j['gov']
+            temp_dep = j['dep']
+            if temp_gov == noun and re.match(pattern_noun,pos_dict[temp_dep]):
+                new_noun = temp_dep+" "+noun
+                return new_noun
+    return noun
+
 def amodRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+    new_gov = checkCompound(gov, pos_dict, rel_dict)
     if (re.match(pattern_adj,pos_dict[dep]) or re.match(pattern_verb,pos_dict[dep])) and re.match(pattern_noun,pos_dict[gov]):
-        asp_sent = testConj(gov,dep,pos_dict,rel_dict,neg,asp_sent)
-        asp_sent = testCompound(gov,dep,pos_dict,rel_dict,neg,asp_sent)
-        asp_sent = testAdvModAdj(gov,dep,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testConj(new_gov,dep,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testCompound(new_gov,dep,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testAdvModAdj(new_gov,dep,pos_dict,rel_dict,neg,asp_sent)
     return asp_sent
 
 def nsubjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
+
+    new_dep = checkCompound(dep,pos_dict,rel_dict)
     if re.match(pattern_adj,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
-        asp_sent = testConj(dep, gov, pos_dict, rel_dict, neg, asp_sent)
-        asp_sent = testCompound(dep, gov, pos_dict, rel_dict, neg, asp_sent)
-        asp_sent = testAdvModAdj(dep, gov, pos_dict, rel_dict, neg, asp_sent)
+        asp_sent = testConj(new_dep, gov, pos_dict, rel_dict, neg, asp_sent)
+        asp_sent = testCompound(new_dep, gov, pos_dict, rel_dict, neg, asp_sent)
+        asp_sent = testAdvModAdj(new_dep, gov, pos_dict, rel_dict, neg, asp_sent)
 
     elif re.match(pattern_verb,pos_dict[gov])and re.match(pattern_noun,pos_dict[dep]):
         asp_sent = testXcompAcomp(dep,gov,pos_dict,rel_dict,neg,asp_sent)
@@ -200,4 +218,4 @@ def dobjRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
 
 def nsubjpassRules(gov,dep,pos_dict,rel_dict,neg,asp_sent):
     if re.match(pattern_verb,pos_dict[gov]) and re.match(pattern_noun,pos_dict[dep]):
-        asp_sent = testConjNpssVerb(dep,gov,pos_dict,rel_dict,neg,asp_sent)
+        asp_sent = testConjNpassVerb(dep,gov,pos_dict,rel_dict,neg,asp_sent)
